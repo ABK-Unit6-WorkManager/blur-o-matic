@@ -36,6 +36,7 @@ class BlurViewModel(application: Application) : ViewModel() {
 
     // New instance variable for the WorkInfo
     internal val outputWorkInfos: LiveData<List<WorkInfo>>
+    internal val progressWorkInfoItems: LiveData<List<WorkInfo>>
 
     private val workManager = WorkManager.getInstance(application)
 
@@ -44,6 +45,7 @@ class BlurViewModel(application: Application) : ViewModel() {
         // This transformation makes sure that whenever the current work Id changes the WorkInfo
         // the UI is listening to changes
         outputWorkInfos = workManager.getWorkInfosByTagLiveData(TAG_OUTPUT)
+        progressWorkInfoItems = workManager.getWorkInfosByTagLiveData(TAG_PROGRESS)
     }
     /**
      * Create the WorkRequest to apply the blur and save the resulting image
@@ -69,6 +71,7 @@ class BlurViewModel(application: Application) : ViewModel() {
                 blurRequest.setInputData(createInputDataForUri())
             }
 
+            blurRequest.addTag(TAG_PROGRESS)
             continuation = continuation.then(blurRequest.build())
         }
 

@@ -10,8 +10,10 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.example.background.KEY_IMAGE_URI
+import com.example.background.PROGRESS
 import com.example.background.R
 import com.example.background.TAG_OUTPUT
+import timber.log.Timber
 import java.lang.IllegalArgumentException
 
 private val TAG = BlurWorker::class.java.simpleName
@@ -27,11 +29,15 @@ class BlurWorker(context: Context, params: WorkerParameters) :
         // makeStatusNotification to notify the user about blurring the image.
         makeStatusNotification("Blurring image", appContext)
 
-        sleep()
+//        sleep()
+        (0..100 step 10).forEach {
+            setProgressAsync(workDataOf(PROGRESS to it))
+            sleep()
+        }
 
         try {
             if (TextUtils.isEmpty(resourceUri)) {
-                Log.e(TAG, "Invalid input uri")
+                Timber.tag(TAG).e("Invalid input uri")
                 throw IllegalArgumentException("Invalid input uri")
             }
 
@@ -54,7 +60,7 @@ class BlurWorker(context: Context, params: WorkerParameters) :
 
             return Result.success(outputData)
         } catch (e: Exception) {
-            Log.e(TAG_OUTPUT, "Error applying blur")
+            Timber.tag(TAG_OUTPUT).e("Error applying blur")
             e.printStackTrace()
             return Result.failure()
         }
